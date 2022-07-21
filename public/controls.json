@@ -1,0 +1,22 @@
+[{ 
+    "right": {
+        "key" : "d",
+        "pressed" : false
+    },
+    "left": {
+        "key" : "a",
+        "pressed" : false
+    },
+    "down": {
+        "key" : "s",
+        "pressed" : false
+    },
+    "jump": {
+        "key" : "space",
+        "pressed" : false
+    },
+    "action": {
+        "key" : "f",
+        "pressed" : false
+    }
+}]

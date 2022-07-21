@@ -10,6 +10,7 @@ class Sprite {
     constructor({ position, velocity }) {
         this.position = position
         this.velocity = velocity
+        this.grounded = false
         this.height = 150
         this.width = 50
     }
@@ -20,16 +21,57 @@ class Sprite {
     }
 
     update() {
+        this.velocity.y += 0.2
+
+        if (this.velocity.y + this.position.y >= canvas.height - this.height) {
+            this.velocity.y = 0
+            this.position.y = canvas.height - this.height
+            this.grounded = true
+        }
+        else {
+            this.grounded = false
+        }
+
         this.position.y += this.velocity.y
         this.position.x += this.velocity.x
 
-        this.velocity.y += 0.2
 
         this.draw()
     }
 }
 
-const player = new Sprite({
+class Player extends Sprite {
+    constructor({ position, velocity }) {
+        super({ position, velocity })
+        this.lastPress = null
+    }
+
+    update() {
+
+        if (keys.right.pressed && this.lastPress == "right") {
+            this.velocity.x = 1
+        }
+        else if (keys.left.pressed && this.lastPress == "left") {
+            this.velocity.x = -1
+        }
+        else
+            this.velocity.x *= ((this.grounded) ? 0.9 : 0.99)
+        if (keys.jump.pressed && this.grounded)
+            this.velocity.y = -10
+        if (keys.action.pressed)
+            this.attack()
+        super.update()
+    }
+
+    attack(){
+        console.log("attacked!");
+        keys.action.pressed = false
+    }
+
+
+}
+
+const player = new Player({
     position: {
         x: 0,
         y: 0
@@ -54,11 +96,23 @@ const enemy = new Sprite({
 
 const keys = {
     right: {
-        key: 'd',
+        key: "d",
         pressed: false
     },
     left: {
-        key: 'a',
+        key: "a",
+        pressed: false
+    },
+    down: {
+        key: "s",
+        pressed: false
+    },
+    jump: {
+        key: ' ',
+        pressed: false
+    },
+    action: {
+        key: "f",
         pressed: false
     }
 }
@@ -76,25 +130,24 @@ function gameloop() {
 gameloop()
 
 window.addEventListener('keydown', (event) => {
-    switch (event.key) {
-        case keys.right.key:
-            keys.right = true
-            break
-        case keys.left.key:
-            keys.left = true
-            break
+    for (const key in keys) {
+        if (Object.hasOwnProperty.call(keys, key)) {
+            const element = keys[key];
+            if (element.key == event.key) {
+                if (key == "right" || key == "left") 
+                    player.lastPress = key
+                element.pressed = true
+            }
+        }
     }
 })
 
 window.addEventListener('keyup', (event) => {
-    switch (event.key) {
-        case keys.right.key:
-            keys.right = false
-            break
-        case keys.left.key:
-            keys.left = false
-            break
+    for (const key in keys) {
+        if (Object.hasOwnProperty.call(keys, key)) {
+            const element = keys[key];
+            if (element.key == event.key) 
+                element.pressed = false
+        }
     }
 })
-
-"asd"
